@@ -1,7 +1,9 @@
+import { AppDataSource } from './data-source.js';
 import express, { urlencoded, json } from 'express';
 import morgan from 'morgan';
 
 const PORT = process.env.PORT || 8080;
+const HOST = process.env.HOST || 'localhost';
 const app = express();
 
 app.use(json());
@@ -13,6 +15,11 @@ app.get('/', (req, res) => {
     res.json({ message: 'Hello World!' });
 });
 
-app.listen(PORT, () => {
-    console.info(`Server is running on : http://localhost:${PORT}`);
-});
+AppDataSource.initialize()
+    .then(async () => {
+        console.log('Database connected');
+        app.listen(PORT, () => {
+            console.log(`Server running at http://${HOST}:${PORT}`);
+        });
+    })
+    .catch((error) => console.log(error));
